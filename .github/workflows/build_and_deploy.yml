@@ -1,0 +1,25 @@
+name: Build docker image for overwall
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and deploy
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: setup auth
+        run: |
+          sed -i 's/V2RAY_UUID=/V2RAY_UUID=${{ secrets.V2RAY_UUID }}/' .proxy.env
+          sed -i 's/V2RAY_DOMAIN=/V2RAY_DOMAIN=${{ secrets.V2RAY_DOMAIN }}/' .proxy.env
+          sed -i 's/DOMAIN_EMAIL=/DOMAIN_EMAIL=${{ secrets.DOMAIN_EMAIL }}/' .proxy.env
+          sed -i 's/SHADOWSOCKS_DOMAIN=/SHADOWSOCKS_DOMAIN=${{ secrets.SHADOWSOCKS_DOMAIN }}/' .proxy.env
+          sed -i 's/SHADOWSOCKS_PASSWORD=/SHADOWSOCKS_PASSWORD=${{ secrets.SHADOWSOCKS_PASSWORD }}/' .proxy.env
+      - name: run services
+        run: |
+           ./start.sh
